@@ -6,11 +6,15 @@ namespace BT5_2_StudentRegistration
     public partial class RegistrationForm : Form
     {
         private readonly RegistrationRepository registrations = new();
+        private readonly ErrorProvider errorProvider;
         private bool databaseReady;
 
         public RegistrationForm()
         {
             InitializeComponent();
+            components ??= new System.ComponentModel.Container();
+            // Khởi tạo lúc chạy để tránh lỗi thuộc tính mở rộng của ErrorProvider trong Designer.
+            errorProvider = new ErrorProvider(components) { ContainerControl = this };
             txtFullName.MaxLength = 200;
             btnRegister.Enabled = false;
             cboCourse.Enabled = false;

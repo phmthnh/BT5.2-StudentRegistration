@@ -14,7 +14,6 @@ namespace BT5_2_StudentRegistration
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.errorProvider = new System.Windows.Forms.ErrorProvider(this.components);
             this.lblTitle = new System.Windows.Forms.Label();
             this.lblFullName = new System.Windows.Forms.Label();
             this.txtFullName = new System.Windows.Forms.TextBox();
@@ -31,7 +30,6 @@ namespace BT5_2_StudentRegistration
             this.btnRegister = new System.Windows.Forms.Button();
             this.btnClear = new System.Windows.Forms.Button();
             this.SuspendLayout();
-            this.errorProvider.ContainerControl = this;
             //
             // lblTitle
             //
@@ -209,6 +207,5 @@ namespace BT5_2_StudentRegistration
         private System.Windows.Forms.CheckBox chkIT;
         private System.Windows.Forms.Button btnRegister;
         private System.Windows.Forms.Button btnClear;
-        private System.Windows.Forms.ErrorProvider errorProvider;
     }
 }
