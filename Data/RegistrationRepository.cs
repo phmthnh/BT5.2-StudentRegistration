@@ -1,5 +1,5 @@
-using System.Globalization;
-using Microsoft.Data.Sqlite;
+using System.Data;
+using Microsoft.Data.SqlClient;
 
 namespace BT5_2_StudentRegistration.Data;
 
@@ -7,6 +7,7 @@ internal sealed class RegistrationRepository
 {
     internal Task InitializeAsync() => Task.Run(() =>
     {
+        Database.EnsureCreated();
         using var connection = Database.OpenConnection();
         using var transaction = connection.BeginTransaction();
         using var command = connection.CreateCommand();
@@ -39,16 +40,16 @@ internal sealed class RegistrationRepository
         command.CommandText = """
             INSERT INTO Registrations
                 (FullName, BirthDate, Phone, CourseId, English, SoftSkills, OfficeIT)
-            VALUES ($name, $birthDate, $phone, $courseId, $english, $softSkills, $officeIT)
-            RETURNING Id;
+            OUTPUT INSERTED.Id
+            VALUES (@name, @birthDate, @phone, @courseId, @english, @softSkills, @officeIT);
             """;
-        command.Parameters.Add("$name", SqliteType.Text).Value = registration.FullName.Trim();
-        command.Parameters.Add("$birthDate", SqliteType.Text).Value = registration.BirthDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
-        command.Parameters.Add("$phone", SqliteType.Text).Value = registration.Phone;
-        command.Parameters.Add("$courseId", SqliteType.Integer).Value = registration.CourseId;
-        command.Parameters.Add("$english", SqliteType.Integer).Value = registration.English;
-        command.Parameters.Add("$softSkills", SqliteType.Integer).Value = registration.SoftSkills;
-        command.Parameters.Add("$officeIT", SqliteType.Integer).Value = registration.OfficeIT;
+        command.Parameters.Add("@name", SqlDbType.NVarChar, 200).Value = registration.FullName.Trim();
+        command.Parameters.Add("@birthDate", SqlDbType.Date).Value = registration.BirthDate.Date;
+        command.Parameters.Add("@phone", SqlDbType.VarChar, 10).Value = registration.Phone;
+        command.Parameters.Add("@courseId", SqlDbType.Int).Value = registration.CourseId;
+        command.Parameters.Add("@english", SqlDbType.Bit).Value = registration.English;
+        command.Parameters.Add("@softSkills", SqlDbType.Bit).Value = registration.SoftSkills;
+        command.Parameters.Add("@officeIT", SqlDbType.Bit).Value = registration.OfficeIT;
         return (long)command.ExecuteScalar()!;
     });
 }

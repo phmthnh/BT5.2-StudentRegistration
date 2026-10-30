@@ -1,5 +1,5 @@
 using BT5_2_StudentRegistration.Data;
-using Microsoft.Data.Sqlite;
+using Microsoft.Data.SqlClient;
 
 namespace BT5_2_StudentRegistration
 {
@@ -34,10 +34,10 @@ namespace BT5_2_StudentRegistration
                 databaseReady = courses.Count > 0;
                 cboCourse.Enabled = btnRegister.Enabled = databaseReady;
             }
-            catch (Exception ex) when (ex is SqliteException or IOException or UnauthorizedAccessException or ArgumentException)
+            catch (Exception ex) when (ex is SqlException or IOException or UnauthorizedAccessException or ArgumentException)
             {
                 if (!IsDisposed)
-                    MessageBox.Show(this, "Không thể mở cơ sở dữ liệu đăng ký. Kiểm tra quyền ghi thư mục dữ liệu rồi mở lại ứng dụng.",
+                    MessageBox.Show(this, "Không thể mở cơ sở dữ liệu đăng ký. Kiểm tra SQL Server và chuỗi kết nối rồi mở lại ứng dụng.",
                         "Lỗi cơ sở dữ liệu", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -92,7 +92,7 @@ namespace BT5_2_StudentRegistration
                               "Đã lưu vào cơ sở dữ liệu.";
                 MessageBox.Show(this, info, "Đăng Ký Thành Công", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            catch (Exception ex) when (ex is SqliteException or IOException or UnauthorizedAccessException or ArgumentException)
+            catch (Exception ex) when (ex is SqlException or IOException or UnauthorizedAccessException or ArgumentException)
             {
                 if (!IsDisposed)
                     MessageBox.Show(this, "Không thể lưu đăng ký vào cơ sở dữ liệu. Dữ liệu trên form được giữ lại để bạn thử lại.",

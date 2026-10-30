@@ -15,7 +15,7 @@
 
 | Bài tập | Tiêu đề bài tập | Trạng thái | Mức độ hoàn thành (%) |
 | :---: | :--- | :---: | :---: |
-| **Bài 5.2** | Nâng cấp Form đăng ký học viên (Bài 4.2) bằng CSDL SQLite | Hoàn thành | 100% |
+| **Bài 5.2** | Nâng cấp Form đăng ký học viên (Bài 4.2) bằng CSDL SQL Server | Hoàn thành | 100% |
 
 ---
 
@@ -23,13 +23,13 @@
 
 ### 1. Form đăng ký học viên (Bài 4.2)
 
-**Kỹ thuật áp dụng:** `MaskedTextBox` nhập số điện thoại, `DateTimePicker` chọn ngày sinh, `ComboBox` đọc danh sách khóa học từ CSDL, `CheckBox` chọn môn bổ sung, `ErrorProvider` kiểm tra dữ liệu và truy vấn SQL có tham số với `Microsoft.Data.Sqlite`.
+**Kỹ thuật áp dụng:** `MaskedTextBox` nhập số điện thoại, `DateTimePicker` chọn ngày sinh, `ComboBox` đọc danh sách khóa học từ CSDL, `CheckBox` chọn môn bổ sung, `ErrorProvider` kiểm tra dữ liệu và truy vấn SQL có tham số với `Microsoft.Data.SqlClient`.
 
 **Chức năng:** Kiểm tra họ tên, số điện thoại đủ 10 chữ số và khóa học; nhấn **Đăng Ký** để lưu dữ liệu rồi hiển thị xác nhận. Nút **Xóa** xóa trắng các ô nhập, giữ nguyên đăng ký đã lưu trong CSDL.
 
-![Giao diện Bài 5.2](docs/registration-sqlite.png)
+![Giao diện Bài 5.2](docs/registration-sqlserver.png)
 
-*Mô tả: Form hiển thị thông tin và mã đăng ký sau khi lưu học viên vào CSDL SQLite thành công.*
+*Mô tả: Form hiển thị thông tin và mã đăng ký sau khi lưu học viên vào CSDL SQL Server thành công.*
 
 ![Danh sách khóa học](Screenshot%202026-09-23%20164341.png)
 
@@ -40,7 +40,7 @@
 - Các bảng được tự tạo từ [Database/Schema.sql](Database/Schema.sql) khi mở ứng dụng lần đầu.
 - Bảng `Courses` lưu năm khóa học của bài gốc; ComboBox đọc danh sách từ bảng này.
 - Bảng `Registrations` lưu họ tên, ngày sinh, điện thoại, khóa học và ba lựa chọn môn bổ sung. Khóa ngoại kiểm tra khóa học hợp lệ.
-- File CSDL: `%LOCALAPPDATA%\LTNET\BT52-StudentRegistration\registrations.db`. Dữ liệu được giữ lại sau khi đóng và mở ứng dụng.
+- CSDL `BT52_StudentRegistration` được lưu trong SQL Server LocalDB instance `LTNET_BT5_SQL`. Dữ liệu được giữ lại sau khi đóng và mở ứng dụng.
 
 ---
 
@@ -50,13 +50,21 @@
 
 - Windows, .NET 10.0 SDK.
 - Visual Studio 2026 (18.0 trở lên), workload **.NET desktop development**.
-- NuGet `Microsoft.Data.Sqlite` được khôi phục khi build; bản SQLite không cần dịch vụ SQL Server.
+- SQL Server Express LocalDB 2025.
+- NuGet `Microsoft.Data.SqlClient` được khôi phục khi build.
 
 ### 2. Clone và chạy bằng Visual Studio
 
 ```bash
 git clone https://github.com/phmthnh/BT5.2-StudentRegistration.git
 cd BT5.2-StudentRegistration
+```
+
+Tạo instance LocalDB một lần trong terminal:
+
+```powershell
+sqllocaldb create LTNET_BT5_SQL
+sqllocaldb start LTNET_BT5_SQL
 ```
 
 1. Mở `BT5_2_StudentRegistration.slnx` bằng Visual Studio.
@@ -72,4 +80,10 @@ Trong thư mục repository:
 dotnet run --project BT5_2_StudentRegistration.csproj
 ```
 
-Có thể đặt biến môi trường `BT52_DATABASE_PATH` để chọn đường dẫn file CSDL khác.
+Chuỗi kết nối mặc định dùng Windows Authentication:
+
+```text
+Server=(localdb)\LTNET_BT5_SQL;Database=BT52_StudentRegistration;Integrated Security=true;Encrypt=true;TrustServerCertificate=true;Connect Timeout=15
+```
+
+Ứng dụng tự tạo CSDL và bảng khi chạy lần đầu. Có thể đặt biến môi trường `BT52_CONNECTION_STRING` để sử dụng SQL Server hoặc CSDL khác; tài khoản kết nối cần quyền tạo CSDL khi CSDL chưa tồn tại. `TrustServerCertificate=true` trong cấu hình mẫu dành cho LocalDB trên máy cá nhân; với máy chủ khác, dùng cấu hình chứng chỉ phù hợp.

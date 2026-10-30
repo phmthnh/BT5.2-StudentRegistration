@@ -1,23 +1,29 @@
-CREATE TABLE IF NOT EXISTS Courses (
-    Id INTEGER PRIMARY KEY,
-    Name TEXT NOT NULL
-);
+IF OBJECT_ID(N'dbo.Courses', N'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.Courses (Id int NOT NULL PRIMARY KEY, Name nvarchar(200) NOT NULL);
+END;
 
-INSERT INTO Courses (Id, Name) VALUES
-    (1, 'Lập trình C# cơ bản'),
-    (2, 'Lập trình Web ASP.NET'),
-    (3, 'Lập trình Mobile Xamarin'),
-    (4, 'Cơ sở dữ liệu SQL Server'),
-    (5, 'Trí tuệ nhân tạo Python')
-ON CONFLICT(Id) DO NOTHING;
+INSERT INTO dbo.Courses (Id, Name)
+SELECT seed.Id, seed.Name
+FROM (VALUES
+    (1, N'Lập trình C# cơ bản'),
+    (2, N'Lập trình Web ASP.NET'),
+    (3, N'Lập trình Mobile Xamarin'),
+    (4, N'Cơ sở dữ liệu SQL Server'),
+    (5, N'Trí tuệ nhân tạo Python')
+) AS seed(Id, Name)
+WHERE NOT EXISTS (SELECT 1 FROM dbo.Courses WITH (UPDLOCK, HOLDLOCK) WHERE Id = seed.Id);
 
-CREATE TABLE IF NOT EXISTS Registrations (
-    Id INTEGER PRIMARY KEY AUTOINCREMENT,
-    FullName TEXT NOT NULL CHECK (length(trim(FullName)) BETWEEN 1 AND 200),
-    BirthDate TEXT NOT NULL CHECK (length(BirthDate) = 10 AND date(BirthDate) IS NOT NULL),
-    Phone TEXT NOT NULL CHECK (length(Phone) = 10 AND Phone NOT GLOB '*[^0-9]*'),
-    CourseId INTEGER NOT NULL REFERENCES Courses(Id),
-    English INTEGER NOT NULL CHECK (English IN (0, 1)),
-    SoftSkills INTEGER NOT NULL CHECK (SoftSkills IN (0, 1)),
-    OfficeIT INTEGER NOT NULL CHECK (OfficeIT IN (0, 1))
-);
+IF OBJECT_ID(N'dbo.Registrations', N'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.Registrations (
+        Id bigint IDENTITY(1,1) NOT NULL PRIMARY KEY,
+        FullName nvarchar(200) NOT NULL CHECK (LEN(LTRIM(RTRIM(FullName))) BETWEEN 1 AND 200),
+        BirthDate date NOT NULL,
+        Phone varchar(10) NOT NULL CHECK (DATALENGTH(Phone) = 10 AND Phone COLLATE Latin1_General_100_BIN2 NOT LIKE '%[^0-9]%'),
+        CourseId int NOT NULL REFERENCES dbo.Courses(Id),
+        English bit NOT NULL,
+        SoftSkills bit NOT NULL,
+        OfficeIT bit NOT NULL
+    );
+END;
